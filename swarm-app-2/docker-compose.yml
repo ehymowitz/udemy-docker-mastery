@@ -1,27 +1,27 @@
-# If taking Docker Mastery, this is the same file you created in 
+# If taking Docker Mastery, this is the same file you created in
 # ./compose-assignment-2
 # If taking Swarm Mastery, this is your starting point for adding secrets :)
 # reminder, this needs to change to 3.1 version to use secrets!
-version: '2'
+version: '3.1'
 
 services:
-
   drupal:
     # this Dockerfile needs at least drupal:8.8.2 to work with postgres:12
-    image: custom-drupal
-    build: .
+    image: drupal:8.8.2
     ports:
       - "8080:80"
     volumes:
       - drupal-modules:/var/www/html/modules
-      - drupal-profiles:/var/www/html/profiles       
-      - drupal-sites:/var/www/html/sites      
+      - drupal-profiles:/var/www/html/profiles
+      - drupal-sites:/var/www/html/sites
       - drupal-themes:/var/www/html/themes
- 
+
   postgres:
     image: postgres:12.1
     environment:
-      - POSTGRES_PASSWORD=mypasswd
+      - POSTGRES_PASSWORD_FILE=/run/secrets/psql-pw
+    secrets:
+      - psql-pw
     volumes:
       - drupal-data:/var/lib/postgresql/data
 
@@ -31,3 +31,7 @@ volumes:
   drupal-profiles:
   drupal-sites:
   drupal-themes:
+
+secrets:
+  psql-pw:
+    external: true
